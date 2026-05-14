@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Afterglow — baby pink / blush / scrapbook paper */
+    --background: 340 60% 98%;
+    --foreground: 330 25% 22%;
+
+    --card: 0 0% 100% / 0.55;
+    --card-foreground: 330 25% 22%;
+
+    --popover: 0 0% 100% / 0.72;
+    --popover-foreground: 330 25% 22%;
+
+    --primary: 343 82% 76%;
+    --primary-foreground: 330 30% 18%;
+
+    --secondary: 330 45% 94%;
+    --secondary-foreground: 330 22% 28%;
+
+    --muted: 330 35% 93%;
+    --muted-foreground: 330 12% 45%;
+
+    --accent: 350 90% 92%;
+    --accent-foreground: 330 28% 24%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 340 35% 88%;
+    --input: 340 35% 88%;
+    --ring: 343 82% 70%;
+
+    --radius: 0.85rem;
+
+    /* Dreamy cinematic gradients */
+    --gradient-dream: linear-gradient(
+      135deg,
+      hsl(340 70% 97%) 0%,
+      hsl(350 85% 94%) 38%,
+      hsl(320 60% 96%) 100%
+    );
+    --gradient-blush: linear-gradient(
+      120deg,
+      hsl(343 90% 88%) 0%,
+      hsl(330 80% 92%) 45%,
+      hsl(280 40% 96%) 100%
+    );
+    --gradient-cinematic: radial-gradient(
+        120% 80% at 10% 0%,
+        hsl(343 95% 92%) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        90% 70% at 100% 20%,
+        hsl(270 45% 94%) 0%,
+        transparent 50%
+      ),
+      linear-gradient(180deg, hsl(340 60% 98%) 0%, hsl(330 50% 96%) 100%);
+
+    --shadow-glass: 0 8px 32px rgba(200, 120, 150, 0.12),
+      0 2px 8px rgba(255, 255, 255, 0.65) inset;
+
+    /* Glass tokens */
+    --glass-bg: rgba(255, 255, 255, 0.42);
+    --glass-border: rgba(255, 255, 255, 0.55);
+    --glass-highlight: rgba(255, 255, 255, 0.35);
+    --glass-blur: 18px;
+  }
+
+  .dark {
+    --background: 320 28% 10%;
+    --foreground: 340 40% 96%;
+
+    --card: 320 22% 14% / 0.55;
+    --card-foreground: 340 40% 96%;
+
+    --popover: 320 22% 14% / 0.75;
+    --popover-foreground: 340 40% 96%;
+
+    --primary: 343 70% 72%;
+    --primary-foreground: 320 28% 10%;
+
+    --secondary: 320 18% 18%;
+    --secondary-foreground: 340 35% 92%;
+
+    --muted: 320 15% 20%;
+    --muted-foreground: 330 15% 68%;
+
+    --accent: 320 22% 20%;
+    --accent-foreground: 340 40% 95%;
+
+    --destructive: 0 62% 48%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 320 18% 24%;
+    --input: 320 18% 24%;
+    --ring: 343 70% 65%;
+
+    --gradient-dream: linear-gradient(
+      135deg,
+      hsl(320 28% 12%) 0%,
+      hsl(310 25% 16%) 50%,
+      hsl(280 22% 14%) 100%
+    );
+    --gradient-blush: linear-gradient(
+      125deg,
+      hsl(330 30% 18%) 0%,
+      hsl(320 28% 14%) 100%
+    );
+    --gradient-cinematic: radial-gradient(
+        100% 80% at 15% 0%,
+        hsl(343 40% 22%) 0%,
+        transparent 55%
+      ),
+      linear-gradient(180deg, hsl(320 28% 10%) 0%, hsl(300 22% 8%) 100%);
+
+    --shadow-glass: 0 12px 40px rgba(0, 0, 0, 0.35),
+      0 1px 0 rgba(255, 255, 255, 0.06) inset;
+
+    --glass-bg: rgba(28, 22, 30, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-highlight: rgba(255, 255, 255, 0.08);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    background-image: var(--gradient-cinematic), var(--noise-soft);
+    background-color: hsl(var(--background));
+    background-attachment: fixed;
+    min-height: 100dvh;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .grain-overlay {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    opacity: 0.04;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}

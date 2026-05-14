@@ -1,0 +1,168 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signupSchema, type SignupInput } from "@afterglow/shared";
+import { GoogleLogin } from "@react-oauth/google";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import * as React from "react";
+import { useForm } from "react-hook-form";
+
+import { GlassCard } from "@/components/glass/glass-card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+export function SignupForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [formError, setFormError] = React.useState<string | null>(null);
+  const googleEnabled = Boolean(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
+
+  const form = useForm<SignupInput>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: { email: "", password: "", name: "" },
+  });
+
+  async function onSubmit(values: SignupInput) {
+    setFormError(null);
+    const res = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(values),
+    });
+    const data = (await res.json()) as { message?: string };
+    if (!res.ok) {
+      setFormError(data.message ?? "Unable to create your account.");
+      return;
+    }
+    const next = searchParams.get("next") ?? "/dashboard";
+    router.replace(next);
+    router.refresh();
+  }
+
+  async function onGoogleCredential(credential: string) {
+    setFormError(null);
+    const res = await fetch("/api/auth/google", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential }),
+    });
+    const data = (await res.json()) as { message?: string };
+    if (!res.ok) {
+      setFormError(data.message ?? "Google sign-in failed.");
+      return;
+    }
+    const next = searchParams.get("next") ?? "/dashboard";
+    router.replace(next);
+    router.refresh();
+  }
+
+  return (
+    <GlassCard tone="lilac" className="space-y-8 rounded-scrapbook p-8 shadow-lift">
+      {googleEnabled ? (
+        <div className="flex flex-col items-center gap-3">
+          <GoogleLogin
+            onSuccess={(cred) => {
+              if (cred.credential) void onGoogleCredential(cred.credential);
+            }}
+            onError={() =>
+              setFormError("Google could not finish signing you in.")
+            }
+            useOneTap={false}
+            theme="filled_blue"
+            shape="pill"
+            size="large"
+            text="signup_with"
+          />
+          <p className="text-xs text-muted-foreground">
+            Or weave your account by hand — slow, soft, deliberate.
+          </p>
+        </div>
+      ) : null}
+
+      {googleEnabled ? (
+        <div className="relative flex items-center justify-center">
+          <div className="absolute inset-0 top-1/2 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+          <span className="relative bg-[var(--glass-bg)] px-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+            Email
+          </span>
+        </div>
+      ) : null}
+
+      <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)} noValidate>
+        <div className="space-y-2">
+          <Label htmlFor="name">Name (optional)</Label>
+          <Input
+            id="name"
+            autoComplete="name"
+            placeholder="How we should whisper to you"
+            {...form.register("name")}
+          />
+          {form.formState.errors.name?.message ? (
+            <p className="text-xs text-destructive">
+              {form.formState.errors.name.message}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            {...form.register("email")}
+          />
+          {form.formState.errors.email?.message ? (
+            <p className="text-xs text-destructive">
+              {form.formState.errors.email.message}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
+            type="password"
+            autoComplete="new-password"
+            placeholder="At least 8 characters, letters + numbers"
+            {...form.register("password")}
+          />
+          {form.formState.errors.password?.message ? (
+            <p className="text-xs text-destructive">
+              {form.formState.errors.password.message}
+            </p>
+          ) : null}
+        </div>
+
+        {formError ? (
+          <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {formError}
+          </p>
+        ) : null}
+
+        <Button
+          type="submit"
+          className="w-full rounded-full shadow-lift"
+          size="lg"
+          disabled={form.formState.isSubmitting}
+        >
+          {form.formState.isSubmitting ? "Creating your glow…" : "Create account"}
+        </Button>
+      </form>
+
+      <p className="text-center text-sm text-muted-foreground">
+        Already glowing?{" "}
+        <Link
+          href="/login"
+          className="font-medium text-primary underline-offset-4 hover:underline"
+        >
+          Sign in
+        </Link>
+      </p>
+    </GlassCard>
+  );
+}
